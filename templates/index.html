@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Media Portal</title>
+    <!-- Google Fonts for typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Phosphor Icons for smooth minimal icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="background-nebula"></div>
+    <div class="container">
+        <header class="glass-header">
+            <h1><i class="ph ph-planet"></i> Cosmic Media Portal</h1>
+            <p>Your local network playground</p>
+        </header>
+
+        <main>
+            <div id="loading" class="loading-state">
+                <i class="ph ph-spinner-gap spin"></i>
+                <p>Scanning subspace anomalies...</p>
+            </div>
+            
+            <div id="media-grid" class="media-grid hidden">
+                <!-- Media cards will be injected here via JS -->
+            </div>
+            
+            <div id="empty-state" class="empty-state hidden">
+                <i class="ph ph-files"></i>
+                <p>No media files discovered. Drop some `.mp4`, `.jpg` files into the `media/` folder on the host machine.</p>
+            </div>
+        </main>
+        
+        <footer class="glass-footer">
+            <p>Running locally on your network.</p>
+            <button id="refresh-btn" class="glass-button" onclick="loadMedia()">
+                <i class="ph ph-arrows-clockwise"></i> Refresh Scan
+            </button>
+        </footer>
+    </div>
+
+    <!-- Main Script -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ filename }} - Media Player</title>
+    <!-- Google Fonts for typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Player specific resets over base cosmic theme */
+        body {
+            overflow: hidden; /* Prevent scrolling in player view */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body class="player-body">
+    <div class="background-nebula"></div>
+    
+    <!-- Floating Back Button -->
+    <a href="/" class="glass-button back-btn">
+        <i class="ph ph-arrow-left"></i> Back to Portal
+    </a>
+
+    <div class="media-container">
+        {% if media_type == 'video' %}
+            <video class="glass-media" controls autoplay data-setup="{}" name="media">
+                <source src="/stream/{{ filename }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% elif media_type == 'image' %}
+            <img class="glass-media" src="/stream/{{ filename }}" alt="{{ filename }}">
+        {% else %}
+            <div class="glass-card unsupported">
+                <i class="ph ph-warning"></i>
+                <p>Unsupported media type.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
