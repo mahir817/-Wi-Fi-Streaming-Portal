@@ -1,22 +1,31 @@
 import os
+import sys
 import re
 import socket
+import mimetypes
 from pathlib import Path
 from flask import Flask, render_template, request, Response, jsonify, send_from_directory
 
-app = Flask(__name__)
+# Support for PyInstaller
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+else:
+    app = Flask(__name__)
 
 MEDIA_DIR = Path("media")
 MEDIA_DIR.mkdir(exist_ok=True)
 
 SUPPORTED_VIDEOS = {'.mp4', '.mkv', '.webm'}
-SUPPORTED_IMAGES = {'.jpg', '.jpeg', '.png'}
+SUPPORTED_IMAGES = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+SUPPORTED_AUDIO = {'.mp3', '.wav', '.ogg', '.m4a', '.flac'}
+SUPPORTED_DOCS = {'.pdf', '.txt', '.md', '.csv', '.json', '.html', '.doc', '.docx', '.xls', '.xlsx'}
 
 def get_local_ip():
     """Returns the local IPv4 address of the host machine."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Doesn't even have to be reachable
         s.connect(('10.255.255.255', 1))
         IP = s.getsockname()[0]
     except Exception:
@@ -46,24 +55,40 @@ def player(filename):
         return "File not found", 404
         
     ext = file_path.suffix.lower()
-    media_type = 'video' if ext in SUPPORTED_VIDEOS else 'image' if ext in SUPPORTED_IMAGES else 'unknown'
+    if ext in SUPPORTED_VIDEOS:
+        media_type = 'video'
+    elif ext in SUPPORTED_IMAGES:
+        media_type = 'image'
+    elif ext in SUPPORTED_AUDIO:
+        media_type = 'audio'
+    else:
+        media_type = 'unknown'
+        
     return render_template('player.html', filename=filename, media_type=media_type)
 
 @app.route('/api/media', methods=['GET'])
 def get_media():
-    """Scans the media directory and returns a JSON list of supported files."""
+    """Scans the media directory and returns a JSON list of all files."""
     media_files = []
     
     if not MEDIA_DIR.exists():
         return jsonify(media_files)
         
     for f in MEDIA_DIR.iterdir():
-        if f.is_file():
+        if f.is_file() and f.name != '.gitkeep':
             ext = f.suffix.lower()
             if ext in SUPPORTED_VIDEOS:
-                media_files.append({"name": f.name, "type": "video"})
+                file_type = "video"
             elif ext in SUPPORTED_IMAGES:
-                media_files.append({"name": f.name, "type": "image"})
+                file_type = "image"
+            elif ext in SUPPORTED_AUDIO:
+                file_type = "audio"
+            elif ext in SUPPORTED_DOCS:
+                file_type = "document"
+            else:
+                file_type = "other"
+                
+            media_files.append({"name": f.name, "type": file_type})
                 
     # Sort files alphabetically
     media_files.sort(key=lambda x: x["name"])
@@ -73,7 +98,7 @@ def get_media():
 def stream(filename):
     """
     Streams media files with HTTP Range Requests support (206 Partial Content).
-    Crucial for seeking/scrubbing in HTML5 video players.
+    Crucial for seeking/scrubbing in HTML5 video and audio players.
     """
     file_path = MEDIA_DIR / filename
     
@@ -83,16 +108,13 @@ def stream(filename):
     file_size = file_path.stat().st_size
     range_header = request.headers.get('Range', None)
     
+    mime_type, _ = mimetypes.guess_type(file_path)
+    if not mime_type:
+        mime_type = 'application/octet-stream'
+
     # If not a range request, just serve the file normally
     if not range_header:
-        ext = file_path.suffix.lower()
-        mimetype = 'video/mp4'
-        if ext in SUPPORTED_VIDEOS:
-            mimetype = f'video/{ext.strip(".")}'
-        elif ext in SUPPORTED_IMAGES:
-            mimetype = f'image/{ext.strip(".").replace("jpg", "jpeg")}'
-            
-        return send_from_directory(MEDIA_DIR, filename, mimetype=mimetype)
+        return send_from_directory(MEDIA_DIR, filename, mimetype=mime_type)
 
     # Handle Range Request
     byte1, byte2 = 0, None
@@ -111,7 +133,7 @@ def stream(filename):
         f.seek(byte1)
         data = f.read(length)
 
-    rv = Response(data, 206, mimetype='video/mp4', direct_passthrough=True)
+    rv = Response(data, 206, mimetype=mime_type, direct_passthrough=True)
     rv.headers.add('Content-Range', f'bytes {byte1}-{byte2}/{file_size}')
     rv.headers.add('Accept-Ranges', 'bytes')
     
@@ -128,7 +150,7 @@ if __name__ == '__main__':
     ip_addr = get_local_ip()
     
     print("=" * 50)
-    print("🚀 WiFi Media Streaming Portal is Running! 🚀")
+    print("🚀 LocalWeb is Running! 🚀")
     print("=" * 50)
     print(f"📡 Access it on this machine: http://localhost:{port}")
     print(f"📱 Open on any device in the same WiFi network:\n")

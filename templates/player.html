@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ filename }} - Media Player</title>
+    <title>{{ filename }} - LocalWeb Player</title>
     <!-- Google Fonts for typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,6 +41,15 @@
             </video>
         {% elif media_type == 'image' %}
             <img class="glass-media" src="/stream/{{ filename }}" alt="{{ filename }}">
+        {% elif media_type == 'audio' %}
+            <div class="glass-card" style="padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <i class="ph ph-music-notes" style="font-size: 4rem; color: #facc15;"></i>
+                <h3 style="word-break: break-all;">{{ filename }}</h3>
+                <audio controls autoplay name="media" style="margin-top: 1rem;">
+                    <source src="/stream/{{ filename }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
         {% else %}
             <div class="glass-card unsupported">
                 <i class="ph ph-warning"></i>

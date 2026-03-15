@@ -173,6 +173,9 @@ main {
 
 .type-video .icon-wrapper { color: #5efce8; }
 .type-image .icon-wrapper { color: #f472b6; }
+.type-audio .icon-wrapper { color: #facc15; }
+.type-document .icon-wrapper { color: #60a5fa; }
+.type-other .icon-wrapper { color: #9ca3af; }
 
 .glass-card .filename {
     font-size: 1rem;

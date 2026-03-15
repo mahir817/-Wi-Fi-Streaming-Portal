@@ -43,7 +43,14 @@ async function loadMedia() {
 
 function createMediaCard(file) {
     const a = document.createElement('a');
-    a.href = `/player/${encodeURIComponent(file.name)}`;
+    
+    if (['video', 'image', 'audio'].includes(file.type)) {
+        a.href = `/player/${encodeURIComponent(file.name)}`;
+    } else {
+        a.href = `/stream/${encodeURIComponent(file.name)}`;
+        a.target = "_blank"; // Open documents and other files directly in the browser or download
+    }
+    
     a.className = `glass-card type-${file.type}`;
     
     const iconWrapper = document.createElement('div');
@@ -52,8 +59,14 @@ function createMediaCard(file) {
     const icon = document.createElement('i');
     if (file.type === 'video') {
         icon.className = 'ph ph-video-camera';
-    } else {
+    } else if (file.type === 'image') {
         icon.className = 'ph ph-image';
+    } else if (file.type === 'audio') {
+        icon.className = 'ph ph-music-notes';
+    } else if (file.type === 'document') {
+        icon.className = 'ph ph-file-text';
+    } else {
+        icon.className = 'ph ph-file';
     }
     
     iconWrapper.appendChild(icon);
