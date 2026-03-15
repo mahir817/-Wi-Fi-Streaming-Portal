@@ -3,44 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalWeb</title>
-    <!-- Google Fonts for typography -->
+    <title>Local Cinema</title>
+    <!-- Google Fonts for cinematic typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <!-- Main Style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Phosphor Icons for smooth minimal icons -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
-    <div class="background-nebula"></div>
-    <div class="container">
-        <header class="glass-header">
-            <h1><i class="ph ph-planet"></i> LocalWeb</h1>
-            <p>Your local network playground for all files</p>
-        </header>
+<body class="fade-in">
+    <div class="background-cinematic"></div>
+    
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <span class="brand-title">Local Cinema</span>
+        </div>
+        <div class="nav-status">
+            <i class="ph ph-wifi-high"></i>
+            <span>Streaming from Laptop</span>
+        </div>
+    </nav>
 
+    <div class="container">
         <main>
+            <section class="hero-section">
+                <h2 class="section-title">Available Media</h2>
+            </section>
+
             <div id="loading" class="loading-state">
                 <i class="ph ph-spinner-gap spin"></i>
-                <p>Scanning subspace anomalies...</p>
+                <p>Loading library...</p>
             </div>
             
             <div id="media-grid" class="media-grid hidden">
-                <!-- Media cards will be injected here via JS -->
+                <!-- Media cards injected via JS -->
             </div>
             
             <div id="empty-state" class="empty-state hidden">
-                <i class="ph ph-files"></i>
-                <p>No files discovered. Drop any files (`.mp4`, `.pdf`, `.jpg`, `.zip`) into the `media/` folder on the host machine.</p>
+                <i class="ph ph-film-slate"></i>
+                <p>No media files discovered. Drop cinematic files (`.mp4`, `.mkv`, etc.) into the `media/` folder.</p>
             </div>
         </main>
         
-        <footer class="glass-footer">
-            <p>Running locally on your network.</p>
-            <button id="refresh-btn" class="glass-button" onclick="loadMedia()">
-                <i class="ph ph-arrows-clockwise"></i> Refresh Scan
+        <footer>
+            <button id="refresh-btn" class="text-button" onclick="loadMedia()">
+                <i class="ph ph-arrows-clockwise"></i> Refresh Library
             </button>
         </footer>
     </div>

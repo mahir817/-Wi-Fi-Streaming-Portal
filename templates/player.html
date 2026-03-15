@@ -3,59 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ filename }} - LocalWeb Player</title>
+    <title>{{ filename }} - Local Cinema</title>
     <!-- Google Fonts for typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <!-- Main Style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        /* Player specific resets over base cosmic theme */
-        body {
-            overflow: hidden; /* Prevent scrolling in player view */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-    </style>
 </head>
-<body class="player-body">
-    <div class="background-nebula"></div>
+<body class="player-body fade-in">
+    <div class="background-cinematic player-bg"></div>
     
-    <!-- Floating Back Button -->
-    <a href="/" class="glass-button back-btn">
-        <i class="ph ph-arrow-left"></i> Back to Portal
-    </a>
+    <!-- Top Navigation for Player -->
+    <nav class="player-nav">
+        <a href="/" class="back-link">
+            <i class="ph ph-caret-left"></i> Back
+        </a>
+        <div class="now-playing">Now Playing</div>
+        <div style="width: 50px;"></div> <!-- Spacer -->
+    </nav>
 
-    <div class="media-container">
-        {% if media_type == 'video' %}
-            <video class="glass-media" controls autoplay data-setup="{}" name="media">
-                <source src="/stream/{{ filename }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        {% elif media_type == 'image' %}
-            <img class="glass-media" src="/stream/{{ filename }}" alt="{{ filename }}">
-        {% elif media_type == 'audio' %}
-            <div class="glass-card" style="padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                <i class="ph ph-music-notes" style="font-size: 4rem; color: #facc15;"></i>
-                <h3 style="word-break: break-all;">{{ filename }}</h3>
-                <audio controls autoplay name="media" style="margin-top: 1rem;">
-                    <source src="/stream/{{ filename }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        {% else %}
-            <div class="glass-card unsupported">
-                <i class="ph ph-warning"></i>
-                <p>Unsupported media type.</p>
-            </div>
-        {% endif %}
+    <div class="player-wrapper">
+        <div class="media-container">
+            {% if media_type == 'video' %}
+                <video class="cinematic-media" controls autoplay name="media">
+                    <source src="/stream/{{ filename }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% elif media_type == 'image' %}
+                <img class="cinematic-media" src="/stream/{{ filename }}" alt="{{ filename }}">
+            {% elif media_type == 'audio' %}
+                <div class="audio-player-card">
+                    <div class="cover-art-placeholder">
+                        <i class="ph ph-music-notes"></i>
+                    </div>
+                    <audio controls autoplay name="media" class="custom-audio">
+                        <source src="/stream/{{ filename }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            {% else %}
+                <div class="unsupported-card">
+                    <i class="ph ph-warning-circle"></i>
+                    <p>Format not supported for cinematic playback.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="media-info">
+            <h1 class="media-title">{{ filename }}</h1>
+            <p class="media-meta">Local Network Stream • Premium Quality</p>
+        </div>
     </div>
 
 </body>

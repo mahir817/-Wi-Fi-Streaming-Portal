@@ -25,57 +25,94 @@ async function loadMedia() {
         if (files.length === 0) {
             emptyState.classList.remove('hidden');
         } else {
-            files.forEach(file => {
-                const card = createMediaCard(file);
-                grid.appendChild(card);
-            });
-            grid.classList.remove('hidden');
+            // Add a slight delay for cinematic loading feel
+            setTimeout(() => {
+                files.forEach((file, index) => {
+                    const card = createMediaCard(file);
+                    // Cascade fade in effect
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    card.classList.add('fade-in');
+                    grid.appendChild(card);
+                });
+                grid.classList.remove('hidden');
+            }, 300);
         }
     } catch (error) {
         console.error("Failed to load media:", error);
-        emptyState.innerHTML = '<i class="ph ph-warning-circle"></i><p>Failed to scan media directory.</p>';
+        emptyState.innerHTML = '<i class="ph ph-warning-circle"></i><p>Failed to scan library.</p>';
         emptyState.classList.remove('hidden');
     } finally {
-        loading.classList.add('hidden');
-        refreshIcon.classList.remove('spin');
+        setTimeout(() => {
+            loading.classList.add('hidden');
+            refreshIcon.classList.remove('spin');
+        }, 300);
     }
 }
 
 function createMediaCard(file) {
     const a = document.createElement('a');
     
-    if (['video', 'image', 'audio'].includes(file.type)) {
+    // Determine link destination
+    const isPlayable = ['video', 'image', 'audio'].includes(file.type);
+    if (isPlayable) {
         a.href = `/player/${encodeURIComponent(file.name)}`;
     } else {
         a.href = `/stream/${encodeURIComponent(file.name)}`;
-        a.target = "_blank"; // Open documents and other files directly in the browser or download
+        a.target = "_blank";
     }
     
-    a.className = `glass-card type-${file.type}`;
+    a.className = 'media-card';
     
-    const iconWrapper = document.createElement('div');
-    iconWrapper.className = 'icon-wrapper';
+    // Thumbnail container
+    const thumbContainer = document.createElement('div');
+    thumbContainer.className = 'card-thumbnail';
     
+    // Placeholder inner
+    const placeholder = document.createElement('div');
+    placeholder.className = 'placeholder-thumb';
+    
+    // Determine icon based on file type
     const icon = document.createElement('i');
-    if (file.type === 'video') {
-        icon.className = 'ph ph-video-camera';
-    } else if (file.type === 'image') {
-        icon.className = 'ph ph-image';
-    } else if (file.type === 'audio') {
-        icon.className = 'ph ph-music-notes';
-    } else if (file.type === 'document') {
-        icon.className = 'ph ph-file-text';
-    } else {
-        icon.className = 'ph ph-file';
-    }
+    if (file.type === 'video') icon.className = 'ph ph-film-strip';
+    else if (file.type === 'image') icon.className = 'ph ph-image-square';
+    else if (file.type === 'audio') icon.className = 'ph ph-vinyl-record';
+    else if (file.type === 'document') icon.className = 'ph ph-file-text';
+    else icon.className = 'ph ph-file';
     
-    iconWrapper.appendChild(icon);
-    a.appendChild(iconWrapper);
+    placeholder.appendChild(icon);
+    thumbContainer.appendChild(placeholder);
+    
+    // Overlay for hover (Play button or Download)
+    const overlay = document.createElement('div');
+    overlay.className = 'card-overlay';
+    const actionIcon = document.createElement('i');
+    actionIcon.className = isPlayable ? 'ph-fill ph-play-circle play-icon' : 'ph-fill ph-download-simple play-icon';
+    overlay.appendChild(actionIcon);
+    thumbContainer.appendChild(overlay);
+    
+    a.appendChild(thumbContainer);
+    
+    // Info Container
+    const infoContainer = document.createElement('div');
+    infoContainer.className = 'card-info';
     
     const title = document.createElement('div');
-    title.className = 'filename';
-    title.textContent = file.name;
-    a.appendChild(title);
+    title.className = 'card-title';
+    // Remove extension for cleaner look
+    const rawName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+    title.textContent = rawName;
+    
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    
+    // Get file extension text
+    const ext = file.name.substring(file.name.lastIndexOf('.') + 1).toUpperCase();
+    meta.textContent = `${file.type} • ${ext}`;
+    
+    infoContainer.appendChild(title);
+    infoContainer.appendChild(meta);
+    
+    a.appendChild(infoContainer);
     
     return a;
 }
